@@ -1,2 +1,7 @@
-# AWS-Lamda-File-Processor
-Creating a serverless system that triggers a Lambda function when a file is uploaded to S3.
+
+# AWS Lambda File Processor
+
+## Public Access
+
+- Exposed via API Gateway
+- Triggered when a file is uploaded to a public S3 bucket
