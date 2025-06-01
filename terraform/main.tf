@@ -1,77 +1,77 @@
-variable "vpc_id" {
-    type     = string
-    default  = "vpc-0b16e539a6d9d52b8"
-    description = "main VPC ID"
-}
+# variable "vpc_id" {
+#     type     = string
+#     default  = "vpc-0b16e539a6d9d52b8"
+#     description = "main VPC ID"
+# }
 
 /// Vpc id data
-data "aws_vpc" "Project1" {
-  id                = var.vpc_id
-}
+# data "aws_vpc" "Project1" {
+#   id                = var.vpc_id
+# }
 
-resource "aws_security_group" "Project1_sg_jenkins_agent" {
-  name        = "main-sg-jenkins-agent"
-  description = "allow access to Jenkins agent"
-  vpc_id      = data.aws_vpc.Project1.id
+# resource "aws_security_group" "Project1_sg_jenkins_agent" {
+#   name        = "main-sg-jenkins-agent"
+#   description = "allow access to Jenkins agent"
+#   vpc_id      = data.aws_vpc.Project1.id
 
-  ingress {
-    from_port   = 50000
-    to_port     = 50000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+#   ingress {
+#     from_port   = 50000
+#     to_port     = 50000
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
 
-}
+# }
 
-/// Aws Subnet Datasource
-data "aws_subnet" "public_subnet_b" {
+# /// Aws Subnet Datasource
+# data "aws_subnet" "public_subnet_b" {
 
-  vpc_id = data.aws_vpc.Project1.id
-  tags = {
-    Name = "main-public-b"
-  }
+#   vpc_id = data.aws_vpc.Project1.id
+#   tags = {
+#     Name = "main-public-b"
+#   }
   
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
-}
+#   filter {
+#     name   = "state"
+#     values = ["available"]
+#   }
+# }
 
-output "public_subnet_id" {
-  value = data.aws_subnet.public_subnet_b.id
-}
+# output "public_subnet_id" {
+#   value = data.aws_subnet.public_subnet_b.id
+# }
 
 
-/// Aws Security Group Datasource
-data "aws_security_group" "Project1_sg_jenkins" {
-    name   = "main-sg-jenkins"
-}
+# /// Aws Security Group Datasource
+# data "aws_security_group" "Project1_sg_jenkins" {
+#     name   = "main-sg-jenkins"
+# }
 
-data "aws_security_group" "Project1_sg_ssh" {
-    name   = "main-sg-ssh"
-}
+# data "aws_security_group" "Project1_sg_ssh" {
+#     name   = "main-sg-ssh"
+# }
 
-/// EC2 Instance
-resource "aws_instance" "ansible_instance" {
-  ami           = data.aws_ami.ubuntu_ami.id
-  instance_type = "t2.medium"
-  key_name      = "toche-key1"
-  subnet_id     = data.aws_subnet.public_subnet_b.id
-  vpc_security_group_ids = [data.aws_security_group.Project1_sg_ssh.id, data.aws_security_group.Project1_sg_jenkins.id, 
-                            aws_security_group.Project1_sg_jenkins_agent.id]
-  user_data = file("~/.vscode/AWS-Lamda-File-Processor/ansible.sh")
+# /// EC2 Instance
+# resource "aws_instance" "ansible_instance" {
+#   ami           = data.aws_ami.ubuntu_ami.id
+#   instance_type = "t2.medium"
+#   key_name      = "toche-key1"
+#   subnet_id     = data.aws_subnet.public_subnet_b.id
+#   vpc_security_group_ids = [data.aws_security_group.Project1_sg_ssh.id, data.aws_security_group.Project1_sg_jenkins.id, 
+#                             aws_security_group.Project1_sg_jenkins_agent.id]
+#   user_data = file("~/.vscode/AWS-Lamda-File-Processor/ansible.sh")
 
-  tags = {
-    Name = "jenkins-master-agent"
-  }
-}
+#   tags = {
+#     Name = "jenkins-master-agent"
+#   }
+# }
 
 resource "aws_s3_bucket" "Project3_bucket" {
   bucket = "aws-lambda-project3-s3-bucket11"

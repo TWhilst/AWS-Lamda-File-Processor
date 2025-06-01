@@ -32,7 +32,7 @@ resource "aws_cloudwatch_log_group" "Project3_log_group_api_gw" {
 
 resource "aws_apigatewayv2_integration" "Project3_integration" {
   api_id = aws_apigatewayv2_api.Project3_api_gateway.id
-  integration_type = ""
+  integration_type = "AWS_PROXY"
   integration_uri = aws_lambda_function.lambda_function.invoke_arn
   integration_method = "POST"
 }
