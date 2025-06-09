@@ -1,65 +1,50 @@
-resource "aws_apigatewayv2_api" "Project3_api_gateway" {
-  name        = "Project3-API-Gateway"
-  protocol_type = "HTTP"
+# API Gateway REST API
+resource "aws_api_gateway_rest_api" "serverless_api" {
+  name        = "Serverless_api"
+  description = "API for Serverless Lambda function"
 }
 
-resource "aws_apigatewayv2_stage" "Project3_stage" {
-  api_id = aws_apigatewayv2_api.Project3_api_gateway.id
-  name   = "api-call"
-  auto_deploy = true
-
-  access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.Project3_log_group_api_gw.arn
-    format          = jsonencode({
-      requestId = "$context.requestId",
-      sourceIp       = "$context.identity.sourceIp",
-      requestTime = "$context.requestTime",
-      protocol = "$context.protocol",
-      httpMethod = "$context.httpMethod",
-      resourcePath     = "$context.resourcePath",
-      routeKey = "$context.routeKey",
-      integrationErrorMessage = "$context.integrationErrorMessage",
-      status   = "$context.status",
-      responseLength = "$context.responseLength"
-    })
-  }
+# API Gateway Resource (Endpoint)
+resource "aws_api_gateway_resource" "lambda_resource" {
+  rest_api_id = aws_api_gateway_rest_api.serverless_api.id
+  parent_id   = aws_api_gateway_rest_api.serverless_api.root_resource_id
+  path_part   = "http"
 }
 
-resource "aws_cloudwatch_log_group" "Project3_log_group_api_gw" {
-  name              = "/aws/api-gw/${aws_apigatewayv2_api.Project3_api_gateway.name}"
-  retention_in_days = 14
+# API Gateway Method (POST request)
+resource "aws_api_gateway_method" "post_method" {
+  rest_api_id   = aws_api_gateway_rest_api.serverless_api.id
+  resource_id   = aws_api_gateway_resource.lambda_resource.id
+  http_method   = "POST"
+  authorization = "NONE"
 }
 
-resource "aws_apigatewayv2_integration" "Project3_integration" {
-  api_id = aws_apigatewayv2_api.Project3_api_gateway.id
-  integration_type = "AWS_PROXY"
-  integration_uri = aws_lambda_function.lambda_function.invoke_arn
-  integration_method = "POST"
+# Lambda integration for API Gateway
+resource "aws_api_gateway_integration" "lambda_integration" {
+  rest_api_id = aws_api_gateway_rest_api.serverless_api.id
+  resource_id = aws_api_gateway_resource.lambda_resource.id
+  http_method = aws_api_gateway_method.post_method.http_method
+  type        = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri         = aws_lambda_function.serverless_lambda_function.invoke_arn
 }
 
-resource "aws_apigatewayv2_route" "Project3_route_get" {
-  api_id = aws_apigatewayv2_api.Project3_api_gateway.id
-  route_key = "GET /severless-lambda-function1"
-  target = "integrations/${aws_apigatewayv2_integration.Project3_integration.id}"
+# Lambda permission to allow API Gateway to invoke the function
+resource "aws_lambda_permission" "allow_api_gateway" {
+  statement_id  = "AllowExecutionFromApiGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.serverless_lambda_function.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.serverless_api.execution_arn}/*/*"
 }
 
-resource "aws_apigatewayv2_route" "Project3_route_post" {
-  api_id = aws_apigatewayv2_api.Project3_api_gateway.id
-  route_key = "POST /severless-lambda-function1"
-  target = "integrations/${aws_apigatewayv2_integration.Project3_integration.id}"
+resource "aws_api_gateway_stage" "example" {
+  deployment_id = aws_api_gateway_deployment.api_deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.serverless_api.id
+  stage_name    = "prod"
 }
 
-resource "aws_lambda_permission" "api_gateway_permission" {
-  statement_id = "AllowExecutionFromAPIGateway"
-  action       = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_function.function_name
-  principal    = "apigateway.amazonaws.com"
-
-  # The source ARN is the API Gateway ARN
-  source_arn = "${aws_apigatewayv2_api.Project3_api_gateway.execution_arn}/*/*"
+resource "aws_api_gateway_deployment" "api_deployment" {
+  depends_on = [aws_api_gateway_integration.lambda_integration]
+  rest_api_id = aws_api_gateway_rest_api.serverless_api.id
 }
-
-output "api_gateway_url" {
-  value = aws_apigatewayv2_stage.Project3_stage.invoke_url
-}
-
