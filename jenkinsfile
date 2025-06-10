@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+    
+    environment {
+        FILE = '/home/ubuntu/jenkins/workspace/lambda_processor/src/lambda_function.py'
+        BUCKET = 's3://aws-lambda-project3-s3-bucket111'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main',
+                credentialsId: 'github',
+                url: 'https://github.com/TWhilst/AWS-Lamda-File-Processor.git'
+            }
+        }
+        
+        stage('Create config file ') {
+            steps {
+                script{
+                    withCredentials([usernamePassword(credentialsId: 'aws_cred', passwordVariable: 'KEY', usernameVariable: 'ACCESS_ID')]) {
+                        sh 'mkdir .aws'
+                        sh 'echo [TWhilst]'
+                        sh 'echo aws_access_key_id = ${ACCESS_ID} > .aws/config'
+                        sh 'echo aws_secret_access_key = ${KEY} > .aws/config'
+                    }
+                }
+                
+            }
+        }
+
+        stage('Initialize Terraform') {
+            steps {
+                sh 'terraform init'
+            }
+        }
+
+        stage('Validate Terraform') {
+            steps {
+                sh 'terraform validate'
+            }
+        }
+
+        stage('Terraform plan') {
+            steps {
+                sh 'terraform init'
+            }
+        }
+
+        stage('Terraform apply') {
+            steps {
+                sh 'terraform apply -auto-approve'
+            }
+        }
+
+        stage('Add File to s3') {
+            steps {
+                sh 'aws s3 cp ${FILE} ${BUCKET}'
+            }
+        }
+
+        stage('Api Call') {
+            steps {
+                sh 'curl -X POST '
+            }
+        }
+    }
+}

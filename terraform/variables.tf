@@ -37,3 +37,11 @@ variable "bucket_name" {
 variable "environment" {
   default = "dev"
 }
+
+variable "vpc_id" {
+  default = ""
+}
+
+variable "subnet_id" {
+  default = ""
+}
