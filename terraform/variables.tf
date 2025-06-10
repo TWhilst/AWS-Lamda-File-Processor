@@ -49,3 +49,11 @@ variable "subnet_id" {
 variable "key_name" {
   default = ""
 }
+
+variable "jenkins_sh" {
+  default = ""
+}
+
+variable "slave_sh" {
+  default = ""
+}

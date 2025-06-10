@@ -4,7 +4,7 @@ resource "aws_instance" "jenkins_server" {
   subnet_id              = data.aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.Project1_sg_ssh.id, aws_security_group.Project1_sg_jenkins.id]
   key_name               = var.key_name
-  user_data              = file("~/.vscode/AWS-Lamda-File-Processor/jenkins.sh")
+  user_data              = file("${var.jenkins_sh}")
 
   tags = {
     Name = "function-jenkins-server"
@@ -17,7 +17,7 @@ resource "aws_instance" "slave_server" {
   subnet_id              = data.aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.Project1_sg_ssh.id, aws_security_group.Project1_sg_http.id]
   key_name               = var.key_name
-  user_data              = file("~/.vscode/AWS-Lamda-File-Processor/slave.sh")
+  user_data              = file("${var.slave_sh}")
   iam_instance_profile  = aws_iam_instance_profile.Admin_access.name
 
   tags = {
