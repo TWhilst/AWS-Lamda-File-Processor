@@ -45,3 +45,7 @@ variable "vpc_id" {
 variable "subnet_id" {
   default = ""
 }
+
+variable "key_name" {
+  default = ""
+}
