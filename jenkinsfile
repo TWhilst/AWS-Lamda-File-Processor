@@ -20,9 +20,9 @@ pipeline {
                 script{
                     withCredentials([usernamePassword(credentialsId: 'aws_cred', passwordVariable: 'KEY', usernameVariable: 'ACCESS_ID')]) {
                         sh 'mkdir .aws'
-                        sh 'echo [TWhilst]'
-                        sh 'echo aws_access_key_id = ${ACCESS_ID} > .aws/config'
-                        sh 'echo aws_secret_access_key = ${KEY} > .aws/config'
+                        sh 'echo [TWhilst] >> .aws/config'
+                        sh 'echo aws_access_key_id = ${ACCESS_ID} >> .aws/config'
+                        sh 'echo aws_secret_access_key = ${KEY} >> .aws/config'
                     }
                 }
                 
@@ -31,25 +31,42 @@ pipeline {
 
         stage('Initialize Terraform') {
             steps {
-                sh 'terraform init'
+                dir ('terraform') {
+                    sh 'terraform init'
+                }
             }
         }
 
         stage('Validate Terraform') {
             steps {
-                sh 'terraform validate'
+                dir ('terraform') {
+                    sh 'terraform validate'
+                }
             }
         }
 
         stage('Terraform plan') {
             steps {
-                sh 'terraform init'
+                dir ('terraform') {
+                    sh 'terraform plan'
+                }
             }
         }
 
         stage('Terraform apply') {
             steps {
-                sh 'terraform apply -auto-approve'
+                dir ('terraform') {
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+
+        stage ('Get invoke url') {
+            steps {
+                dir('terraform') {
+                    sh 'terraform state list'
+                    sh 'terraform state show aws_api_gateway_deployment.api_deployment'
+                }
             }
         }
 
