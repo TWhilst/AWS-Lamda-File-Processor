@@ -1,11 +1,11 @@
 # Creating s3 resource for invoking to lambda function
-# resource "aws_s3_bucket" "bucket" {
-#   bucket = var.bucket_name
+resource "aws_s3_bucket" "bucket" {
+  bucket = var.bucket_name
 
-#   tags = {
-#     Environment = var.environment
-#   }
-# }
+  tags = {
+    Environment = var.environment
+  }
+}
 
 resource "aws_s3_bucket_public_access_block" "bucket_pab" {
   bucket = aws_s3_bucket.bucket.id
