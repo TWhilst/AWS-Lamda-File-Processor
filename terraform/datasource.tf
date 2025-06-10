@@ -9,16 +9,16 @@ data "aws_ami" "ubuntu_ami" {
 
 }
 
-/// Aws Subnet Datasource
-data "aws_subnet" "public_subnet" {
+# /// Aws Subnet Datasource
+# data "aws_subnet" "public_subnet" {
 
-  vpc_id = var.vpc_id
+#   vpc_id = var.vpc_id
   
-  filter {
-    name   = "subnet-id"
-    values = ["${var.subnet_id}"]
-  }
-}
+#   filter {
+#     name   = "subnet-id"
+#     values = ["${var.subnet_id}"]
+#   }
+# }
 
 # // This is a Terraform data source to create an IAM policy document for the Lambda function
 # data "aws_iam_policy_document" "lambda_role" {
