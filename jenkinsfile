@@ -2,14 +2,14 @@ pipeline {
     agent any
     
     environment {
-        FILE = '/home/ubuntu/jenkins/workspace/lambda_processor/src/lambda_function.py'
+        FILE = '/home/ubuntu/jenkins/workspace/lambda/src/lambda_function.py'
         BUCKET = 's3://aws-lambda-project3-s3-bucket111'
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main',
+                git branch: 'lambda1',
                 credentialsId: 'github',
                 url: 'https://github.com/TWhilst/AWS-Lamda-File-Processor.git'
             }
@@ -41,6 +41,7 @@ pipeline {
             steps {
                 dir ('terraform') {
                     sh 'terraform validate'
+                    // sh 'terraform destroy -auto-approve'
                 }
             }
         }
@@ -76,10 +77,10 @@ pipeline {
             }
         }
 
-        stage('Api Call') {
-            steps {
-                sh 'curl -X POST '
-            }
-        }
+        // stage('Api Call') {
+        //     steps {
+        //         sh 'curl -X POST '
+        //     }
+        // }
     }
 }
