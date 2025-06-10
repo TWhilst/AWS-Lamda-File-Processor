@@ -1,22 +1,22 @@
 # Creating Lambda IAM resource role for lambda
-resource "aws_iam_role" "lambda_iam" {
-  name = var.lambda_role_name
+# resource "aws_iam_role" "lambda_iam" {
+#   name = var.lambda_role_name
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
+#   assume_role_policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Effect": "Allow",
+#       "Principal": {
+#         "Service": "lambda.amazonaws.com"
+#       },
+#       "Action": "sts:AssumeRole"
+#     }
+#   ]
+# }
+# EOF
+# }
 
 # Attaching lambda iam role to s3 policy
 resource "aws_iam_role_policy" "attach_lambda_role_to_s3_policy" {
