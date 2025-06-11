@@ -76,10 +76,10 @@ pipeline {
             }
         }
 
-        stage('Api Call') {
-            steps {
-                sh 'curl -X POST '
-            }
-        }
+        // stage('Api Call') {
+        //     steps {
+        //         sh 'curl -X POST '
+        //     }
+        // }
     }
 }
