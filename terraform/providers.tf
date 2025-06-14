@@ -9,6 +9,6 @@ terraform {
 
 provider "aws" {
   region                   = "us-west-2"
-  shared_credentials_files = ["/home/ubuntu/jenkins/workspace/lambda_processor/.aws/config"]
+  shared_credentials_files = ["/home/ubuntu/jenkins/workspace/lambda/.aws/config"]
   profile                  = "TWhilst"
 }
